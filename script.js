@@ -82,8 +82,9 @@ const displayMovements = (movements) => {
     const type = mov > 0 ? "deposit" : "withdrawal";
     const html = `
     <div class="movements__row">
-      <div class="movements__type movements__type--${type}">${mov} ${type}</div>
-      <div class="movements__date">3 days ago</div>
+      <div class="movements__type movements__type--${type}">${
+      i + 1
+    } ${type}</div>
       <div class="movements__value">${mov}€</div>
   </div>
     `;
@@ -192,4 +193,19 @@ btnClose.addEventListener("click", (e) => {
   }
 
   inputCloseUsername.value = inputClosePin.value = "";
+});
+
+btnLoan.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  const amount = Number(inputLoanAmount.value);
+  if (
+    amount > 0 &&
+    currentAccount.movements.some((mov) => mov >= amount * 0.1)
+  ) {
+    currentAccount.movements.push(amount);
+    updateUI(currentAccount);
+  }
+
+  inputLoanAmount.value = "";
 });
