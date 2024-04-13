@@ -92,8 +92,9 @@ const displayMovements = (movements) => {
   });
 };
 
-const calcDisplayBalance = (movements) => {
-  const balance = movements.reduce((acc, mov) => acc + mov, 0);
+const calcDisplayBalance = (acc) => {
+  const balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
+  acc.balance = balance;
   labelBalance.textContent = `${balance}€`;
 };
 
@@ -129,6 +130,12 @@ const createUsernames = (accs) => {
   });
 };
 
+const updateUI = (acc) => {
+  displayMovements(acc.movements);
+  calcDisplayBalance(acc);
+  calcDisplaySummary(acc);
+};
+
 createUsernames(accounts);
 
 let currentAccount;
@@ -143,11 +150,29 @@ btnLogin.addEventListener("click", (e) => {
       currentAccount.owner.split(" ")[0]
     }`;
     containerApp.style.opacity = 100;
-    displayMovements(currentAccount.movements);
-    calcDisplayBalance(currentAccount.movements);
-    calcDisplaySummary(currentAccount);
+    updateUI(currentAccount);
   }
   inputLoginPin.value = "";
   inputLoginUsername.value = "";
   inputLoginPin.blur();
+});
+
+btnTransfer.addEventListener("click", (e) => {
+  e.preventDefault();
+  const receiverAcc = accounts.find(
+    (acc) => acc.username === inputTransferTo.value
+  );
+  const transferAmount = Number(inputTransferAmount.value);
+  inputTransferAmount.value = inputTransferTo.value = "";
+  inputTransferAmount.blur();
+  if (
+    receiverAcc &&
+    transferAmount > 0 &&
+    currentAccount.balance >= transferAmount &&
+    receiverAcc.username !== currentAccount.username
+  ) {
+    currentAccount.movements.push(-transferAmount);
+    receiverAcc.movements.push(transferAmount);
+    updateUI(currentAccount);
+  }
 });
